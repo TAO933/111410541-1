@@ -1,0 +1,29 @@
+// Max.asm：比較 RAM[0] 與 RAM[1]，把較大者存進 RAM[2]
+// D = RAM[0] - RAM[1]；若 D > 0 表示 RAM[0] 較大
+
+@R0
+D=M
+
+@R1
+D=D-M
+
+@OUTPUT_FIRST
+D;JGT
+
+@R1
+D=M
+
+@OUTPUT_D
+0;JMP
+
+(OUTPUT_FIRST)
+@R0
+D=M
+
+(OUTPUT_D)
+@R2
+M=D
+
+(INFINITE_LOOP)
+@INFINITE_LOOP
+0;JMP
