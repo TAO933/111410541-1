@@ -1,0 +1,4 @@
+// 最簡單的堆疊運算：7 + 8，結果留在堆疊頂端。
+push constant 7
+push constant 8
+add

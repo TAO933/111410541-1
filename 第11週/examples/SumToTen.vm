@@ -1,0 +1,25 @@
+// 用 temp 變數計算 1 + 2 + ... + 10，最後把結果 push 到堆疊。
+push constant 0
+pop temp 0          // sum = 0
+push constant 1
+pop temp 1          // i = 1
+
+label LOOP
+push temp 1
+push constant 10
+gt
+if-goto END         // if i > 10 goto END
+
+push temp 0
+push temp 1
+add
+pop temp 0          // sum = sum + i
+
+push temp 1
+push constant 1
+add
+pop temp 1          // i = i + 1
+goto LOOP
+
+label END
+push temp 0         // 將 sum（55）留在堆疊頂端
