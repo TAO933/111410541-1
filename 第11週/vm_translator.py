@@ -20,18 +20,18 @@ from parser import Parser
 from codewriter import CodeWriter
 
 
-def collect_vm_files(source: str):
-    """回傳 (檔案清單, 是否為資料夾)。"""
+def find_vm_files(source: str):
+    """回傳 (檔案清單, 是否為資料夾)，錯誤時丟出 ValueError。"""
     if os.path.isdir(source):
         files = sorted(glob.glob(os.path.join(source, "*.vm")))
         if not files:
-            sys.exit(f"錯誤：資料夾內沒有 .vm 檔：{source}")
+            raise ValueError(f"資料夾內沒有 .vm 檔：{source}")
         return files, True
 
-    if not source.endswith(".vm"):
-        sys.exit("錯誤：輸入檔必須是 .vm，或是一個包含 .vm 檔的資料夾")
+    if not source.lower().endswith(".vm"):
+        raise ValueError("輸入檔必須是 .vm，或是一個包含 .vm 檔的資料夾")
     if not os.path.isfile(source):
-        sys.exit(f"錯誤：找不到檔案：{source}")
+        raise ValueError(f"找不到檔案：{source}")
     return [source], False
 
 
@@ -63,6 +63,30 @@ def translate(files, output: str, bootstrap: bool) -> int:
     return count
 
 
+def translate_source(source: str, output: str = None, bootstrap: bool = None):
+    """翻譯檔案或資料夾，回傳本次工作的統計資訊。
+
+    bootstrap=None 時採用預設規則：單檔不加、資料夾加。
+    """
+    files, is_dir = find_vm_files(source)
+
+    if bootstrap is None:
+        bootstrap = is_dir
+
+    out_name = output or default_output(source, is_dir)
+    if not out_name.lower().endswith(".asm"):
+        out_name += ".asm"
+
+    count = translate(files, out_name, bootstrap)
+    return {
+        "files": files,
+        "is_dir": is_dir,
+        "output": out_name,
+        "count": count,
+        "bootstrap": bootstrap,
+    }
+
+
 def main():
     ap = argparse.ArgumentParser(description="Nand2Tetris VM 翻譯器")
     ap.add_argument("source", help="輸入的 .vm 檔，或包含 .vm 檔的資料夾")
@@ -74,26 +98,23 @@ def main():
                       help="強制不加入 bootstrap")
     args = ap.parse_args()
 
-    files, is_dir = collect_vm_files(args.source)
-    source = args.source
-
     if args.bootstrap:
         bootstrap = True
     elif args.no_bootstrap:
         bootstrap = False
     else:
-        bootstrap = is_dir
+        bootstrap = None
 
-    out_name = args.output or default_output(source, is_dir)
-    if not out_name.lower().endswith(".asm"):
-        out_name += ".asm"
+    try:
+        stats = translate_source(args.source, args.output, bootstrap)
+    except ValueError as exc:
+        sys.exit(f"錯誤：{exc}")
 
-    count = translate(files, out_name, bootstrap)
-
-    target = os.path.normpath(source) if is_dir else source
-    print(f"翻譯完成: {target} -> {out_name} "
-          f"({len(files)} 個檔案, {count} 道指令, "
-          f"bootstrap={'是' if bootstrap else '否'})")
+    source = args.source
+    target = os.path.normpath(source) if stats["is_dir"] else source
+    print(f"翻譯完成: {target} -> {stats['output']} "
+          f"({len(stats['files'])} 個檔案, {stats['count']} 道指令, "
+          f"bootstrap={'是' if stats['bootstrap'] else '否'})")
 
 
 if __name__ == "__main__":

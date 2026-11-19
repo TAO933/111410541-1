@@ -12,6 +12,8 @@
 | 檔案 | 說明 |
 | --- | --- |
 | `vm_translator.py` | 主程式：解析命令列、走訪 `.vm` 檔、產生 `.asm` |
+| `gui.py` | **Tkinter 圖形介面**：選檔、設定 bootstrap、翻譯與顯示紀錄 |
+| `run_gui.bat` | Windows 雙擊啟動圖形介面 |
 | `parser.py` | **Parser**：解析每道 VM 指令，取出 type / arg1 / arg2 |
 | `codewriter.py` | **CodeWriter**：把 VM 指令翻譯成 Hack 組合語言 |
 | `examples/SimpleAdd.vm` | 範例：7 + 8 |
@@ -35,6 +37,29 @@ py vm_translator.py examples/SimpleAdd.vm --bootstrap
 # 強制不加 bootstrap
 py vm_translator.py ..\somewhere\FibonacciElement --no-bootstrap
 ```
+
+## 圖形介面（Tkinter）
+
+不想打指令時，可以直接開啟圖形介面：
+
+```powershell
+py gui.py
+```
+
+或在 Windows 上雙擊 `run_gui.bat`。
+
+介面功能：
+
+- 選擇單一 `.vm` 檔，或整個包含 `.vm` 的資料夾
+- 自動帶出輸出 `.asm` 路徑，也可自行修改或另存
+- Bootstrap 可選「自動 / 一律加入 / 一律不加」
+- 翻譯完成後顯示檔案數、指令數與 bootstrap 狀態
+- 執行紀錄會列出選擇的輸入檔案與錯誤訊息
+- 可一鍵開啟輸出資料夾
+- 快捷鍵：`Ctrl+O` 選檔案、`Ctrl+Shift+O` 選資料夾、`Ctrl+Enter` 翻譯
+
+圖形介面與命令列共用同一套 `vm_translator.py` / `parser.py` / `codewriter.py`，
+翻譯結果完全一致。
 
 ### Bootstrap 規則
 
