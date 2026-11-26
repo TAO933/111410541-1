@@ -1,0 +1,16 @@
+class Main {
+  function void main() {
+    var Array a;
+    var int length, i, sum;
+    let length = 3;
+    let a = Array.new(length);
+    let i = 0;
+    while (i < length) {
+      let a[i] = i * 2;
+      let sum = sum + a[i];
+      let i = i + 1;
+    }
+    do Output.printInt(sum);
+    return;
+  }
+}

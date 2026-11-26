@@ -1,0 +1,9 @@
+class SquareGame {
+  field Square square;
+  constructor SquareGame new() {
+    let square = Square.new(0, 0, 30);
+    return this;
+  }
+  method void dispose() { do square.dispose(); return; }
+  method void run() { do square.moveUp(); return; }
+}
